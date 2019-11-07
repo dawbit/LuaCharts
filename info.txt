@@ -1,0 +1,4 @@
+Path to files with values:
+C:\Users\[YOUR NAME]\Lua
+
+Working only on Windows operating system
