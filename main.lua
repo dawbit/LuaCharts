@@ -1,4 +1,15 @@
 require "turtle"
+windowTitle = "generator wykresów 2000"
+open(windowTitle)
+startPos = -165
+width = 10
+local side = 110;
+numberOfData = 0
+windowWidth = 1300
+windowHeight = 900
+size(windowWidth,windowHeight)
+zero(60, windowHeight/2)
+updt(true)
 
 local open = io.open
  
@@ -30,10 +41,10 @@ end
 --print(os.getenv("DRIVE"))
 --require 'paths'
 --paths.mkdir('C:\test')
-print (fileContent)
+--print (fileContent)
 --print(type(fileContent)) --string
-
-
+ 
+ 
 function explode(div,str) -- credit: http://richard.warburton.it
   if (div=='') then return false end
   local pos,arr = 0,{}
@@ -48,36 +59,106 @@ end
  
  --print(explode(";", explode("\n", fileContent)[1])[1])
  
-startPos = -165
+
 local rainbow = {
-  "#FF0000", "#FF8F00", "#F0F000", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF",
+"#ff0099", "#ff0037","#ff0000","#ff4400","#ff7300","#ffaa00","#ffcc00","#fff200","#d0ff00","#91ff00","#48ff00",
+"#00ff3c","#00ff95","#00ffcc","#00fffb","#00e1ff","#00aaff","#0084ff","#003cff","#5100ff","#8c00ff","#bf00ff","#e600ff","#ff00c8","#ff0077"
 }
 
-local c = 1
+dataArray = {}
 
-function drawBar(height, width, tekst)
-  pncl(rainbow[c])
-  turn(270)
-  move(height)
-  turn(90)
-  move(width)
-  turn(90)
-  move(height)
-  turn(90)
-  move(width)
-  text(tekst, -90, 14, 10)
-  jump(-50)
-  turn(180)
-  c = c + 1
+local k = 1
+while (explode("\n", fileContent)[k] ~= "") do
+  dataArray[k] = {}
+  for j = 1, 2 do
+    dataArray[k][j] = explode(";", explode("\n", fileContent)[k])[j]
+  end
+  k = k + 1
+  numberOfData = numberOfData + 1
 end
-jump(startPos)
-drawBar(150, 10, "test1")
-drawBar(30, 10, "test2")
-drawBar(170, 10, "dłuższy test 3")
-drawBar(120, 10, "test4")
-drawBar(80, 10, "test5")
-drawBar(69, 10, "test6")
-drawBar(200, 10, "test7")
+
+--print(dataArray[2][2])
+max = tonumber(dataArray[1][2])
+for i = 1, numberOfData do
+  if max < math.abs(tonumber(dataArray[i][2])) then max = math.abs(tonumber(dataArray[i][2])) end
+end
 
 
+local c = 1
+print(max)
+ 
+function drawBar(height, width, tekst)
+  local scaled = (height / max) * 100
+    pncl(rainbow[c])
+    turn(270)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(height,  90, -13, -10)
+    turn(90)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(tekst, -45, 13, side)
+    jump(-50)
+    turn(180)
+    c = c + 1
+end
+--jump(startPos)
+
+for i = 1 , numberOfData do
+  drawBar(dataArray[i][2], width, dataArray[i][1])
+end
+
+print(numberOfData)
+
+
+pncl(colr(150,150,150))
+line(-15, 0, numberOfData*52, 0) 
+pncl(colr(0,0,0))
+line(-15, -side, -15, side) 
+text("Wartość", 0, -numberOfData*52, -side-30)
+line(-15, side, numberOfData*52, side) 
+text("i chuj", 0, 0, side + 10)
+
+
+
+--jump(numberOfData*-54)
+--move(numberOfData*54)
+--jump(numberOfData*-54)
+--turn(270)
+--move(150)
+
+--drawBar(150, 10, "test1")
+--drawBar(30, 10, "test2")
+--drawBar(170, 10, "dłuższy test 3")
+--drawBar(120, 10, "test4")
+--drawBar(80, 10, "test5")
+--drawBar(69, 10, "test6")
+--drawBar(200, 10, "test7")
+
+
+sciezka = (os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua")
+save(os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua\\wykres")
+print("Plik został zapisany w lokalizacji:")
+print(sciezka)
 wait()
+
+--local side = 225;
+--local maxx, maxy = 10, 20
+--pncl(colr(200,200,200))
+--line(-side, 0, side, 0) text("x", 0, side-15, 2)
+--line(0, -side, 0, side) text("y", 0, 5, -side+15)
+--pncl(colr(128,160,255))
+
+--function f(x) return math.sin(x)^-1 + 1*math.cos(x) end
+
+--local xp = -maxx
+--local yp = f(xp)
+--posn(xp*side/maxx, yp*(-side/maxy))
+--for x = -maxx, maxx, 0.05 do
+  --local y = f(x)
+  --move((x-xp)*side/maxx, (y-yp)*(-side/maxy))
+  --xp, yp = x, y
+--end
+--wait()
