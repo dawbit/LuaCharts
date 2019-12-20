@@ -1,4 +1,147 @@
 require "turtle"
+package.cpath = package.cpath..";./?.dll;./?.so;../lib/?.so;../lib/vc_dll/?.dll;../lib/bcc_dll/?.dll;../lib/mingw_dll/?.dll;"
+require("wx")
+
+--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OKIENKOWATOR@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+frame = nil
+
+-- Create a function to encapulate the code, not necessary, but it makes it
+--  easier to debug in some cases.
+function main()
+
+    -- create the wxFrame window
+    frame = wx.wxFrame( wx.NULL,            -- no parent for toplevel windows
+                        wx.wxID_ANY,          -- don't need a wxWindow ID
+                        "Chart Generator", -- caption on the frame
+                        wx.wxDefaultPosition, -- let system place the frame
+                        wx.wxSize(450, 450),  -- set the size of the frame
+                        wx.wxDEFAULT_FRAME_STYLE ) -- use default frame styles
+
+    -- create a single child window, wxWidgets will set the size to fill frame
+    panel = wx.wxPanel(frame, wx.wxID_ANY)
+
+    -- connect the paint event handler function with the paint event
+    --panel:Connect(wx.wxEVT_PAINT, OnPaint)
+    ID_FILEPICKERCTRL = 1014
+    ID_BUTTON = 1015
+    ID_BITMAPCOMBOBOX = 1016
+    ID_DIRPICKERCTRL = 1017
+    ID_TEXTCONTROL = 1018
+    
+--wybor pliku do załadowania
+filePath = wx.wxFilePickerCtrl(panel, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFileSelectorPromptStr, wx.wxFileSelectorDefaultWildcardStr,
+                                         wx.wxDefaultPosition, wx.wxDefaultSize,
+                                         wx.wxFLP_USE_TEXTCTRL)
+
+
+--wybor typu wykresu, zrobic ify, ktore beda wywolywac odpowiednia funkcje z opdowiednym typem wykresu;
+chartTypeSelection = wx.wxBitmapComboBox(panel, ID_BITMAPCOMBOBOX, "wxBitmapComboBox",
+                                         wx.wxPoint(5,25), wx.wxDefaultSize,
+                                         {"Wykres liniowy", "Wykres wertykalny", "Wykres horyzontalny"},
+                                         wx.wxTE_PROCESS_ENTER) 
+--wybor folderu gdzie ma byc zapisany screen wykresu
+ imageDir = wx.wxDirPickerCtrl(panel, ID_DIRPICKERCTRL, wx.wxGetCwd(), "Sciezka obrazka",
+                                         wx.wxPoint(5,50), wx.wxDefaultSize,
+                                         wx.wxDIRP_USE_TEXTCTRL)
+--Nazwa obrazka do zapisu
+imagename = wx.wxTextCtrl(panel, ID_TEXTCONTROL, "NazwaObrazka",
+                          wx.wxPoint(5,75), wx.wxDefaultSize)
+                        
+--Przycisk "ok" wywołujący wykres
+buttontest = wx.wxButton(panel, ID_BUTTON, "OK",
+                        wx.wxPoint(5,100), wx.wxDefaultSize)
+                      
+
+--Opcjonalnie zrobić 2 pola tekstowe do wyboru rozmiaru okna z wykresem
+
+print("aaa")
+print(filePath.path);
+    -- create a simple file menu
+    local fileMenu = wx.wxMenu()
+    fileMenu:Append(wx.wxID_EXIT, "E&xit", "Quit the program")
+
+    -- create a simple help menu
+    local helpMenu = wx.wxMenu()
+    helpMenu:Append(wx.wxID_ABOUT, "&About", "About the wxLua Minimal Application")
+
+    -- create a menu bar and append the file and help menus
+    local menuBar = wx.wxMenuBar()
+    menuBar:Append(fileMenu, "&File")
+    menuBar:Append(helpMenu, "&Help")
+
+    -- attach the menu bar into the frame
+    frame:SetMenuBar(menuBar)
+
+    -- create a simple status bar
+    frame:CreateStatusBar(1)
+    frame:SetStatusText("Welcome to wxLua.")
+
+    -- connect the selection event of the exit menu item to an
+    -- event handler that closes the window
+    frame:Connect(wx.wxID_EXIT, wx.wxEVT_COMMAND_MENU_SELECTED,
+                  function (event) frame:Close(true) end )
+
+    -- connect the selection event of the about menu item
+    frame:Connect(wx.wxID_ABOUT, wx.wxEVT_COMMAND_MENU_SELECTED,
+        function (event)
+            wx.wxMessageBox('To generuje wykresy',
+                            "O generowarce",
+                            wx.wxOK + wx.wxICON_INFORMATION,
+                            frame)
+        end )
+
+    frame:Connect(ID_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+        function (event)
+            frame:Close(true)
+            print("Przycisk naciśnion")
+        end )
+    -- show the frame window
+    frame:Show(true)
+    
+    frame:Connect(ID_DIRPICKERCTRL, wx.wxEVT_COMMAND_DIRPICKER_CHANGED,
+        function (event)
+            print("Sciezka obrazka")
+            sciezka = event:GetPath()
+            print(sciezka)
+        end )
+      
+frame:Connect(ID_TEXTCONTROL, wx.wxEVT_COMMAND_TEXT_UPDATED,
+        function (event)
+            print("OBRAZ")
+            tekstNazwaObrazka = event:GetString()
+            print(tekstNazwaObrazka)
+        end )
+      
+frame:Connect(ID_FILEPICKERCTRL, wx.wxEVT_COMMAND_FILEPICKER_CHANGED,
+        function (event)
+            print("Sciezka pliku")
+            sciezkaPliku = event:GetPath()
+            print(sciezkaPliku)
+        end )
+    -- show the frame window
+    frame:Show(true)
+    
+frame:Connect(ID_BITMAPCOMBOBOX, wx.wxEVT_COMMAND_COMBOBOX_SELECTED,
+        function (event)
+            print("TypWykresu")
+            typWykresuTekst = event:GetString()
+            print(typWykresuTekst)
+        end )
+    -- show the frame window
+    frame:Show(true)
+end
+
+main()
+
+-- Call wx.wxGetApp():MainLoop() last to start the wxWidgets event loop,
+-- otherwise the wxLua program will exit immediately.
+-- Does nothing if running from wxLua, wxLuaFreeze, or wxLuaEdit since the
+-- MainLoop is already running or will be started by the C++ program.
+wx.wxGetApp():MainLoop()
+
+
+--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@WYKRESOWATOR@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 windowTitle = "generator wykresów 2000"
 open(windowTitle)
 startPos = -165
@@ -23,9 +166,9 @@ local function read_file(path)
 end
  
 --local fileContent = read_file(os.getenv("HOMEDRIVE")+os.getenv("HOMEPATH")+"\\Lua\test.txt");
-os.execute("mkdir " .. (os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua"))
+--os.execute("mkdir " .. (os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua"))
 --os.execute("mkdir " .. (os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."/Lua"))
-local fileContent = read_file(os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua\\test.txt");
+local fileContent = read_file(sciezkaPliku); --Tutaj dać zmienną przechowującą ścieżkę wczytaną z okienka
  
 --- Check if a directory exists in this path
 function isdir(path)
@@ -106,43 +249,104 @@ function drawBar(height, width, tekst)
 end
 --jump(startPos)
 
-for i = 1 , numberOfData do
-  drawBar(dataArray[i][2], width, dataArray[i][1])
+
+function drawBarHorizontal(height, width, tekst)
+  local scaled = (height / max) * 100
+    pncl(rainbow[c])
+    turn(0)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(height,  0, 15, -13)
+    turn(90)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(tekst, 0, -10, -20)
+    jump(50)
+    turn(90)
+    c = c + 1
+end
+--jump(startPos)
+
+function drawBarLine(height, width, tekst)
+  local scaled = (height / max) * 100
+    pncl(rainbow[c])
+    turn(270)
+    move(scaled)
+    turn(90)
+    move(width)
+    --text(height,  90, -13, -10)
+    turn(90)
+    move(scaled)
+    turn(90)
+    move(width)
+    --text(tekst, -45, 13, side)
+    jump(-50)
+    turn(180)
+    c = c + 1
 end
 
-print(numberOfData)
+function standard()
+  for i = 1 , numberOfData do
+    drawBar(dataArray[i][2], width, dataArray[i][1])
+  end 
+  
+  print(numberOfData)
+  pncl(colr(150,150,150))
+  line(-15, 0, numberOfData*52, 0) 
+  pncl(colr(0,0,0))
+  line(-15, -side, -15, side) 
+  text("Wartość", 0, -numberOfData*52, -side-30)
+  line(-15, side, numberOfData*52, side) 
+  text("Zmienna", 0, 0, side + 10)
+  zapiszObrazek()
+end
+
+function horizontal()
+  for i = 1 , numberOfData do
+    drawBarHorizontal(dataArray[i][2], width, dataArray[i][1])
+  end
+  pncl(colr(150,150,150))
+  line(0, -numberOfData*52, 0, 30) 
+  
+  zapiszObrazek()
+end
+
+function linearChart()
+  for i = 1 , numberOfData do
+  --drawBar(dataArray[i][2], width, dataArray[i][1])
+  pncl(rainbow[i+8])
+  line(30*i, tonumber(dataArray[i+1][2]), 30*i-30, tonumber(dataArray[i][2])) 
+  end
+  print(numberOfData)
 
 
-pncl(colr(150,150,150))
-line(-15, 0, numberOfData*52, 0) 
-pncl(colr(0,0,0))
-line(-15, -side, -15, side) 
-text("Wartość", 0, -numberOfData*52, -side-30)
-line(-15, side, numberOfData*52, side) 
-text("i chuj", 0, 0, side + 10)
+  pncl(colr(150,150,150))
+  line(-15, 0, numberOfData*52, 0) 
+  pncl(colr(0,0,0))
+  line(-15, -side, -15, side) 
+  text("Wartość", 0, -numberOfData*52, -side-30)
+  line(-15, side, numberOfData*52, side) 
+  text("Zmienna", 0, 0, side + 10)
+  zapiszObrazek()
+end
 
+  function zapiszObrazek()
+    sciezka = sciezka .. '\\' .. tekstNazwaObrazka
+    save(sciezka)
+    print("Plik został zapisany w lokalizacji:")
+    print(sciezka)
+    wait()  
+  end
 
-
---jump(numberOfData*-54)
---move(numberOfData*54)
---jump(numberOfData*-54)
---turn(270)
---move(150)
-
---drawBar(150, 10, "test1")
---drawBar(30, 10, "test2")
---drawBar(170, 10, "dłuższy test 3")
---drawBar(120, 10, "test4")
---drawBar(80, 10, "test5")
---drawBar(69, 10, "test6")
---drawBar(200, 10, "test7")
-
-
-sciezka = (os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua")
-save(os.getenv("HOMEDRIVE")..os.getenv("HOMEPATH").."\\Lua\\wykres")
-print("Plik został zapisany w lokalizacji:")
-print(sciezka)
-wait()
+--Wywoływanie odpowiednich typów wykresów
+if (typWykresuTekst == "Wykres wertykalny") then standard()
+  elseif (typWykresuTekst == "Wykres horyzontalny") then horizontal()
+  elseif (typWykresuTekst == "Wykres liniowy") then linearChart()
+  else print("Brak implementacji")
+end
+--end
 
 --local side = 225;
 --local maxx, maxy = 10, 20
