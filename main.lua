@@ -15,11 +15,12 @@ function main()
                         "Chart Generator", -- caption on the frame
                         wx.wxDefaultPosition, -- let system place the frame
                         wx.wxSize(450, 450),  -- set the size of the frame
-                        wx.wxDEFAULT_FRAME_STYLE ) -- use default frame styles
+                        wx.wxDEFAULT_FRAME_STYLE 
+                        ) -- use default frame styles
 
     -- create a single child window, wxWidgets will set the size to fill frame
     panel = wx.wxPanel(frame, wx.wxID_ANY)
-
+panel:SetBackgroundColour(wx.wxColour(255, 100, 100))
     -- connect the paint event handler function with the paint event
     --panel:Connect(wx.wxEVT_PAINT, OnPaint)
     ID_FILEPICKERCTRL = 1014
@@ -27,6 +28,8 @@ function main()
     ID_BITMAPCOMBOBOX = 1016
     ID_DIRPICKERCTRL = 1017
     ID_TEXTCONTROL = 1018
+    
+
     
 --wybor pliku do załadowania
 filePath = wx.wxFilePickerCtrl(panel, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFileSelectorPromptStr, wx.wxFileSelectorDefaultWildcardStr,
@@ -37,7 +40,7 @@ filePath = wx.wxFilePickerCtrl(panel, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFil
 --wybor typu wykresu, zrobic ify, ktore beda wywolywac odpowiednia funkcje z opdowiednym typem wykresu;
 chartTypeSelection = wx.wxBitmapComboBox(panel, ID_BITMAPCOMBOBOX, "wxBitmapComboBox",
                                          wx.wxPoint(5,25), wx.wxDefaultSize,
-                                         {"Wykres liniowy", "Wykres wertykalny", "Wykres horyzontalny"},
+                                         {"Wykres liniowy", "Wykres wertykalny", "Wykres horyzontalny", "kolo", "sinus", "cosinus"},
                                          wx.wxTE_PROCESS_ENTER) 
 --wybor folderu gdzie ma byc zapisany screen wykresu
  imageDir = wx.wxDirPickerCtrl(panel, ID_DIRPICKERCTRL, wx.wxGetCwd(), "Sciezka obrazka",
@@ -45,15 +48,15 @@ chartTypeSelection = wx.wxBitmapComboBox(panel, ID_BITMAPCOMBOBOX, "wxBitmapComb
                                          wx.wxDIRP_USE_TEXTCTRL)
 --Nazwa obrazka do zapisu
 imagename = wx.wxTextCtrl(panel, ID_TEXTCONTROL, "NazwaObrazka",
-                          wx.wxPoint(5,75), wx.wxDefaultSize)
+                          wx.wxPoint(5,180), wx.wxDefaultSize)
                         
 --Przycisk "ok" wywołujący wykres
-buttontest = wx.wxButton(panel, ID_BUTTON, "OK",
-                        wx.wxPoint(5,100), wx.wxDefaultSize)
+buttontest = wx.wxButton(panel, ID_BUTTON, "Generuj wykres",
+                        wx.wxPoint(5,200), wx.wxDefaultSize)
                       
 
 --Opcjonalnie zrobić 2 pola tekstowe do wyboru rozmiaru okna z wykresem
-
+buttontest:SetBackgroundColour(wx.wxColour(100, 255, 100)) -- tak sie zmienia kolory elementów 
 print("aaa")
 print(filePath.path);
     -- create a simple file menu
@@ -269,6 +272,25 @@ function drawBarHorizontal(height, width, tekst)
 end
 --jump(startPos)
 
+function drawGraph(height, width, tekst)
+  local scaled = (height / max) * 100
+    pncl(rainbow[c])
+    turn(0)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(height,  0, 15, -13)
+    turn(90)
+    move(scaled)
+    turn(90)
+    move(width)
+    text(tekst, 0, -10, -20)
+    jump(50)
+    turn(90)
+    c = c + 1
+end
+--jump(startPos)
+
 function drawBarLine(height, width, tekst)
   local scaled = (height / max) * 100
     pncl(rainbow[c])
@@ -303,6 +325,72 @@ function standard()
   zapiszObrazek()
 end
 
+function circle2()
+  
+  pncl(colr(150,150,150))
+  crcl(50, 50, 100, ranc())
+
+  
+  line(0, -numberOfData*52, 0, 30) 
+
+
+  zapiszObrazek()
+  
+end
+function sinus()
+  
+ pncl(colr(200,200,200))
+pncl(colr(128,160,255))
+local side = 225;
+local maxx, maxy = 10, 20
+
+line(-side, 0, side, 0) text("x", 0, side-15, 2)
+line(0, -side, 0, side) text("y", 0, 5, -side+15)
+
+
+function f(x) return math.sin(x) end
+
+local xp = -maxx
+local yp = f(xp)
+posn(xp*side/maxx, yp*(-side/maxy))
+for x = -maxx, maxx, 0.05 do
+  local y = f(x)
+  move((x-xp)*side/maxx, (y-yp)*(-side/maxy))
+  xp, yp = x, y
+end
+
+
+  zapiszObrazek()
+  
+end
+function cosinus()
+  
+ pncl(colr(200,200,200))
+pncl(colr(128,160,255))
+local side = 225;
+local maxx, maxy = 10, 20
+
+line(-side, 0, side, 0) text("x", 0, side-15, 2)
+line(0, -side, 0, side) text("y", 0, 5, -side+15)
+
+
+function f(x) return math.cos(x) end
+
+local xp = -maxx
+local yp = f(xp)
+posn(xp*side/maxx, yp*(-side/maxy))
+for x = -maxx, maxx, 0.05 do
+  local y = f(x)
+  move((x-xp)*side/maxx, (y-yp)*(-side/maxy))
+  xp, yp = x, y
+end
+
+  
+
+
+  zapiszObrazek()
+  
+end
 function horizontal()
   for i = 1 , numberOfData do
     drawBarHorizontal(dataArray[i][2], width, dataArray[i][1])
@@ -311,6 +399,7 @@ function horizontal()
   line(0, -numberOfData*52, 0, 30) 
   
   zapiszObrazek()
+  
 end
 
 function linearChart()
@@ -343,10 +432,18 @@ end
 --Wywoływanie odpowiednich typów wykresów
 if (typWykresuTekst == "Wykres wertykalny") then standard()
   elseif (typWykresuTekst == "Wykres horyzontalny") then horizontal()
-  elseif (typWykresuTekst == "Wykres liniowy") then linearChart()
+elseif (typWykresuTekst == "Wykres liniowy") then linearChart()
+elseif (typWykresuTekst == "kolo") then circle2()
+elseif (typWykresuTekst == "sinus") then sinus()
+elseif (typWykresuTekst == "cosinus") then cosinus()
+  
   else print("Brak implementacji")
 end
 --end
+
+
+
+
 
 --local side = 225;
 --local maxx, maxy = 10, 20
