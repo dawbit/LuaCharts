@@ -29,7 +29,7 @@ panel:SetBackgroundColour(wx.wxColour(255, 100, 100))
     ID_DIRPICKERCTRL = 1017
     ID_TEXTCONTROL = 1018
     
-
+nazwa = "nazwa obrazka"
     
 --wybor pliku do załadowania
 filePath = wx.wxFilePickerCtrl(panel, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFileSelectorPromptStr, wx.wxFileSelectorDefaultWildcardStr,
@@ -39,20 +39,20 @@ filePath = wx.wxFilePickerCtrl(panel, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFil
 
 --wybor typu wykresu, zrobic ify, ktore beda wywolywac odpowiednia funkcje z opdowiednym typem wykresu;
 chartTypeSelection = wx.wxBitmapComboBox(panel, ID_BITMAPCOMBOBOX, "wxBitmapComboBox",
-                                         wx.wxPoint(5,25), wx.wxDefaultSize,
+                                         wx.wxPoint(5,40), wx.wxDefaultSize,
                                          {"Wykres liniowy", "Wykres wertykalny", "Wykres horyzontalny", "kolo", "sinus", "cosinus"},
                                          wx.wxTE_PROCESS_ENTER) 
 --wybor folderu gdzie ma byc zapisany screen wykresu
  imageDir = wx.wxDirPickerCtrl(panel, ID_DIRPICKERCTRL, wx.wxGetCwd(), "Sciezka obrazka",
-                                         wx.wxPoint(5,50), wx.wxDefaultSize,
+                                         wx.wxPoint(5,80), wx.wxDefaultSize,
                                          wx.wxDIRP_USE_TEXTCTRL)
 --Nazwa obrazka do zapisu
-imagename = wx.wxTextCtrl(panel, ID_TEXTCONTROL, "NazwaObrazka",
+imagename = wx.wxTextCtrl(panel, ID_TEXTCONTROL, nazwa,
                           wx.wxPoint(5,180), wx.wxDefaultSize)
-                        
+                      
 --Przycisk "ok" wywołujący wykres
 buttontest = wx.wxButton(panel, ID_BUTTON, "Generuj wykres",
-                        wx.wxPoint(5,200), wx.wxDefaultSize)
+                        wx.wxPoint(5,220), wx.wxDefaultSize)
                       
 
 --Opcjonalnie zrobić 2 pola tekstowe do wyboru rozmiaru okna z wykresem
@@ -422,6 +422,7 @@ function linearChart()
 end
 
   function zapiszObrazek()
+    tekstNazwaObrazka = "obrazek"
     sciezka = sciezka .. '\\' .. tekstNazwaObrazka
     save(sciezka)
     print("Plik został zapisany w lokalizacji:")
